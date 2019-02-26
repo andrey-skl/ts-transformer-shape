@@ -1,9 +1,9 @@
-# ts-transformer-keys
-A TypeScript custom transformer which enables to obtain keys of given type.
+# ts-transformer-shape
+A custom TypeScript transformation to extract object structure from interface
 
 [![Build Status][travis-image]][travis-url]
 [![NPM version][npm-image]][npm-url]
-[![Downloads](https://img.shields.io/npm/dm/ts-transformer-keys.svg)](https://www.npmjs.com/package/ts-transformer-keys)
+[![Downloads](https://img.shields.io/npm/dm/ts-transformer-shape.svg)](https://www.npmjs.com/package/ts-transformer-shape)
 
 # Requirement
 TypeScript >= 2.4.1
@@ -11,19 +11,19 @@ TypeScript >= 2.4.1
 # How to use this package
 
 This package exports 2 functions.
-One is `keys` which is used in TypeScript codes to obtain keys of given type, while the other is a TypeScript custom transformer which is used to compile the `keys` function correctly.
+One is `shape` which is used in TypeScript codes to obtain keys of given type, while the other is a TypeScript custom transformer which is used to compile the `shape` function correctly.
 
-## How to use `keys`
+## How to use `shape`
 
 ```ts
-import { keys } from 'ts-transformer-keys';
+import { shape } from 'ts-transformer-shape';
 
 interface Props {
   id: string;
   name: string;
   age: number;
 }
-const keysOfProps = keys<Props>();
+const keysOfProps = shape<Props>();
 
 console.log(keysOfProps); // ['id', 'name', 'age']
 ```
@@ -39,7 +39,7 @@ See [examples/webpack](examples/webpack) for detail.
 
 ```js
 // webpack.config.js
-const keysTransformer = require('ts-transformer-keys/transformer').default;
+const shapeTransformer = require('ts-transformer-shape/transformer').default;
 
 module.exports = {
   // ...
@@ -51,7 +51,7 @@ module.exports = {
         options: {
           getCustomTransformers: program => ({
               before: [
-                  keysTransformer(program)
+                  shapeTransformer(program)
               ]
           })
         }
@@ -69,13 +69,13 @@ See [examples/rollup](examples/rollup) for detail.
 ```js
 // rollup.config.js
 import typescript from 'rollup-plugin-typescript2';
-import keysTransformer from 'ts-transformer-keys/transformer';
+import shapeTransformer from 'ts-transformer-shape/transformer';
 
 export default {
   // ...
   plugins: [
     typescript({ transformers: [service => ({
-      before: [ keysTransformer(service.getProgram()) ],
+      before: [ shapeTransformer(service.getProgram()) ],
       after: []
     })] })
   ]
@@ -94,7 +94,7 @@ See [ttypescript's README](https://github.com/cevek/ttypescript/blob/master/READ
   "compilerOptions": {
     // ...
     "plugins": [
-      { "transform": "ts-transformer-keys/transformer" }
+      { "transform": "ts-transformer-shape/transformer" }
     ]
   },
   // ...
@@ -108,7 +108,7 @@ You can try it with `$ npm test`.
 
 ```js
 const ts = require('typescript');
-const keysTransformer = require('ts-transformer-keys/transformer').default;
+const shapeTransformer = require('ts-transformer-shape/transformer').default;
 
 const program = ts.createProgram([/* your files to compile */], {
   strict: true,
@@ -117,7 +117,7 @@ const program = ts.createProgram([/* your files to compile */], {
 });
 
 const transformers = {
-  before: [keysTransformer(program)],
+  before: [shapeTransformer(program)],
   after: []
 };
 const { emitSkipped, diagnostics } = program.emit(undefined, undefined, undefined, false, transformers);
@@ -132,7 +132,7 @@ As a result, the TypeScript code shown [here](#how-to-use-keys) is compiled into
 ```js
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var ts_transformer_keys_1 = require("ts-transformer-keys");
+var ts_transformer_keys_1 = require("ts-transformer-shape");
 var keysOfProps = ["id", "name", "age"];
 console.log(keysOfProps); // ['id', 'name', 'age']
 ```
@@ -154,7 +154,7 @@ class MyClass<T extends object> {
 
 MIT
 
-[travis-image]:https://travis-ci.org/kimamula/ts-transformer-keys.svg?branch=master
-[travis-url]:https://travis-ci.org/kimamula/ts-transformer-keys
-[npm-image]:https://img.shields.io/npm/v/ts-transformer-keys.svg?style=flat
-[npm-url]:https://npmjs.org/package/ts-transformer-keys
+[travis-image]:https://travis-ci.org/huston007/ts-transformer-shape.svg?branch=master
+[travis-url]:https://travis-ci.org/huston007/ts-transformer-shape
+[npm-image]:https://img.shields.io/npm/v/ts-transformer-shape.svg?style=flat
+[npm-url]:https://npmjs.org/huston007/ts-transformer-shape

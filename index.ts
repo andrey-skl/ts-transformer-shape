@@ -1,1 +1,5 @@
-export declare function keys<T extends object>(): Array<keyof T>;
+interface anyObject {
+  [k: string]: null | anyObject;
+}
+
+export declare function shape<T extends object>(): anyObject;

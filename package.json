@@ -1,22 +1,26 @@
 {
-  "name": "ts-transformer-keys",
-  "version": "0.3.4",
-  "description": "Check equality of objects based on their contextual type in TypeScript",
+  "name": "ts-transformer-shape",
+  "version": "0.0.1",
+  "description": "A custom TypeScript transformation to extract object structure from interface",
   "main": "index.js",
   "scripts": {
+    "compile": "tsc transformer.ts",
     "test": "tsc && node ./test/compileMain.js && mocha ./test/main.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kimamula/ts-transformer-keys.git"
+    "url": "git+https://github.com/huston007/ts-transformer-shape.git"
   },
   "keywords": [
     "TypeScript"
   ],
-  "author": "kimamula",
+  "authors": "kimamula",
+  "contributors": [
+    "huston007"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kimamula/ts-transformer-keys/issues"
+    "url": "https://github.com/huston007/ts-transformer-shape/issues"
   },
   "files": [
     "index.js",
@@ -24,7 +28,7 @@
     "transformer.js",
     "transformer.ts"
   ],
-  "homepage": "https://github.com/kimamula/ts-transformer-keys#readme",
+  "homepage": "https://github.com/huston007/ts-transformer-shape#readme",
   "devDependencies": {
     "@types/mocha": "^5.2.3",
     "@types/node": "^10.3.5",

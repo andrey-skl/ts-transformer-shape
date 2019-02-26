@@ -21,8 +21,7 @@ function walkShape(type: ts.Type, typeChecker: ts.TypeChecker): ts.ObjectLiteral
     return ts.createNull();
   }
 
-  // @ts-ignore
-  const values: ts.Symbol[] = Array.from(type.symbol.members.values());
+  const values: ts.Symbol[] = typeChecker.getAugmentedPropertiesOfType(type);
 
   return ts.createObjectLiteral(values.map((val: ts.Symbol) => {
     let valueType = typeChecker.getTypeAtLocation(val.valueDeclaration);
@@ -57,6 +56,7 @@ function visitNode(node: ts.Node, program: ts.Program): ts.Node {
   if (!node.typeArguments) {
     return ts.createArrayLiteral([]);
   }
+  debugger
   const type = typeChecker.getTypeFromTypeNode(node.typeArguments[0]);
   if (!type.symbol) {
     return ts.createObjectLiteral([]);

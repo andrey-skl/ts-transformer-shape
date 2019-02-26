@@ -155,5 +155,5 @@ MIT
 
 [travis-image]:https://travis-ci.org/huston007/ts-transformer-shape.svg?branch=master
 [travis-url]:https://travis-ci.org/huston007/ts-transformer-shape
-[npm-image]:https://img.shields.io/npm/v/ts-transformer-shape.svg?style=flat
-[npm-url]:https://npmjs.org/huston007/ts-transformer-shape
+[npm-image]:https://img.shields.io/npm/v/@huston007/ts-transformer-shape.svg?style=flat
+[npm-url]:https://www.npmjs.com/package/@huston007/ts-transformer-shape

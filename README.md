@@ -11,7 +11,7 @@ TypeScript >= 2.4.1
 # How to use this package
 
 This package exports 2 functions.
-One is `shape` which is used in TypeScript codes to obtain keys of given type, while the other is a TypeScript custom transformer which is used to compile the `shape` function correctly.
+One is `shape` which is used in TypeScript codes to obtain shape of given type, while the other is a TypeScript custom transformer which is used to compile the `shape` function correctly.
 
 ## How to use `shape`
 

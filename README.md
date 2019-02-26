@@ -3,7 +3,7 @@ A custom TypeScript transformation to extract object structure from interface
 
 [![Build Status][travis-image]][travis-url]
 [![NPM version][npm-image]][npm-url]
-[![Downloads](https://img.shields.io/npm/dm/ts-transformer-shape.svg)](https://www.npmjs.com/package/ts-transformer-shape)
+[![Downloads](https://img.shields.io/npm/dm/@huston007/ts-transformer-shape.svg)](https://www.npmjs.com/package/@huston007/ts-transformer-shape)
 
 # Requirement
 TypeScript >= 2.4.1

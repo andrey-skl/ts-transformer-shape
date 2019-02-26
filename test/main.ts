@@ -51,9 +51,19 @@ describe('shape', () => {
     });
   });
 
-  it('should construct shape of optional types', () => {
-    assert.deepStrictEqual(shape<FooBar>(), {foo: null, bar: null});
+  it('should construct shape of array values', () => {
+    interface Foo {
+      str: string;
+      foo: string[];
+      inn: BarBaz[]
+    }
+    console.log('shape<Foo>()', shape<Foo>())
+    assert.deepStrictEqual(shape<Foo>(), {str: null, foo: [null], inn: [{bar: null, baz: null}]});
   });
+
+  // it('should construct shape of optional types', () => {
+  //   assert.deepStrictEqual(shape<FooBar>(), {foo: null, bar: null});
+  // });
 
   // it('should construct shape of union', () => {
   //   assert.deepStrictEqual(shape<FooBar & BarBaz>(), {foo: null, bar: null, baz: null});

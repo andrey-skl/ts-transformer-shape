@@ -16,11 +16,24 @@ function walkShape(type: ts.Type, typeChecker: ts.TypeChecker): ts.ObjectLiteral
     return ts.createNull();
   }
 
+  // TODO: find better way to not walk through native types
+  if (['Function', 'Date'].includes(type.symbol.name)) {
+    return ts.createNull();
+  }
+
   // @ts-ignore
   const values: ts.Symbol[] = Array.from(type.symbol.members.values());
 
   return ts.createObjectLiteral(values.map((val: ts.Symbol) => {
     const valueType = typeChecker.getTypeAtLocation(val.valueDeclaration);
+
+    if (valueType.symbol && valueType.symbol.name === 'Array') {
+      return ts.createPropertyAssignment(
+        val.name,
+        // @ts-ignore
+        ts.createArrayLiteral([walkShape(valueType.typeArguments[0], typeChecker)])
+      );
+    }
 
     return ts.createPropertyAssignment(val.name, walkShape(valueType, typeChecker));
   }));

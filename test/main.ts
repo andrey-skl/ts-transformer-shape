@@ -57,23 +57,32 @@ describe('shape', () => {
       foo: string[];
       inn: BarBaz[]
     }
-    console.log('shape<Foo>()', shape<Foo>())
     assert.deepStrictEqual(shape<Foo>(), {str: null, foo: [null], inn: [{bar: null, baz: null}]});
   });
 
-  // it('should construct shape of optional types', () => {
-  //   assert.deepStrictEqual(shape<FooBar>(), {foo: null, bar: null});
-  // });
+  it('should construct shape of optional primitive types', () => {
+    interface Test {
+      foo?: number;
+    }
+    assert.deepStrictEqual(shape<Test>(), {foo: null});
+  });
 
-  // it('should construct shape of union', () => {
-  //   assert.deepStrictEqual(shape<FooBar & BarBaz>(), {foo: null, bar: null, baz: null});
-  // });
+  it('should construct deep shape of optional object types', () => {
+    interface Test {
+      foo?: {test: string};
+    }
+    console.log('shape<Test>()', shape<Test>())
+    assert.deepStrictEqual(shape<Test>(), {foo: {test: null}});
+  });
 
-  // it('should construct shape of joint', () => {
-  //   assert.deepStrictEqual(shape<FooBar | BarBaz>(), {bar: null});
-  // });
+  it('should construct deep shape of nullable object types', () => {
+    interface Test {
+      foo: null | {test: string};
+    }
+    assert.deepStrictEqual(shape<Test>(), {foo: {test: null}});
+  });
 
-  it('should construct shape with any', () => {
+  it('should construct empty shape with any', () => {
     assert.deepStrictEqual(shape<FooBar & any>(), {});
     assert.deepStrictEqual(shape<FooBar | any>(), {});
   });

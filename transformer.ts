@@ -25,7 +25,7 @@ function walkShape(type: ts.Type, typeChecker: ts.TypeChecker): ts.ObjectLiteral
   const values: ts.Symbol[] = Array.from(type.symbol.members.values());
 
   return ts.createObjectLiteral(values.map((val: ts.Symbol) => {
-    const valueType = typeChecker.getTypeAtLocation(val.valueDeclaration);
+    let valueType = typeChecker.getTypeAtLocation(val.valueDeclaration);
 
     if (valueType.symbol && valueType.symbol.name === 'Array') {
       return ts.createPropertyAssignment(
@@ -33,6 +33,16 @@ function walkShape(type: ts.Type, typeChecker: ts.TypeChecker): ts.ObjectLiteral
         // @ts-ignore
         ts.createArrayLiteral([walkShape(valueType.typeArguments[0], typeChecker)])
       );
+    }
+
+    // Handle optional types like {foo?: string}, {foo: null | string}
+    // @ts-ignore
+    const possibleTypes = valueType.types;
+    if (possibleTypes) {
+      const betterType = possibleTypes.filter((t: ts.Type) => !!t.symbol)[0];
+      if (betterType) {
+        valueType = betterType;
+      }
     }
 
     return ts.createPropertyAssignment(val.name, walkShape(valueType, typeChecker));

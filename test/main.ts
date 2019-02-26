@@ -71,7 +71,6 @@ describe('shape', () => {
     interface Test {
       foo?: {test: string};
     }
-    console.log('shape<Test>()', shape<Test>())
     assert.deepStrictEqual(shape<Test>(), {foo: {test: null}});
   });
 

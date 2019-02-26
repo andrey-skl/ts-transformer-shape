@@ -1,23 +1,21 @@
-import { keys } from '../../index';
-
-keys();
+import {shape} from '../../index';
 
 interface Foo {
   foo: string;
+  bar: number;
 }
-const fooKeys = keys<Foo>();
+const fooKeys = shape<Foo>();
 console.log(fooKeys[0]);
 
 type FooBar = Foo & { bar: number; };
-keys<FooBar>()[1];
+shape<FooBar>().bar;
 type FooBarBaz = FooBar | { bar: Function; baz: Date; };
-const fooBarBazKeys = keys<FooBarBaz>();
-fooBarBazKeys.forEach(key => console.log(key));
-
-keys.toString();
+const fooBarBazShape = shape<FooBarBaz>();
+console.log('fooBarBazShape', fooBarBazShape)
+shape.toString();
 
 class MyClass<T extends object> {
   keys() {
-    return keys<T>();
+    return shape<T>();
   }
 }

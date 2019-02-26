@@ -11,21 +11,39 @@ function visitNodeAndChildren(node: ts.Node, program: ts.Program, context: ts.Tr
   return ts.visitEachChild(visitNode(node, program), childNode => visitNodeAndChildren(childNode, program, context), context);
 }
 
+function walkShape(type: ts.Type, typeChecker: ts.TypeChecker): ts.ObjectLiteralExpression | ts.NullLiteral {
+  if (!type.symbol || !type.symbol.members) {
+    return ts.createNull();
+  }
+
+  // @ts-ignore
+  const values: ts.Symbol[] = Array.from(type.symbol.members.values());
+
+  return ts.createObjectLiteral(values.map((val: ts.Symbol) => {
+    const valueType = typeChecker.getTypeAtLocation(val.valueDeclaration);
+
+    return ts.createPropertyAssignment(val.name, walkShape(valueType, typeChecker));
+  }));
+}
+
 function visitNode(node: ts.Node, program: ts.Program): ts.Node {
   const typeChecker = program.getTypeChecker();
-  if (!isKeysCallExpression(node, typeChecker)) {
+  if (!isShapeCallExpression(node, typeChecker)) {
     return node;
   }
   if (!node.typeArguments) {
     return ts.createArrayLiteral([]);
   }
   const type = typeChecker.getTypeFromTypeNode(node.typeArguments[0]);
-  const properties = typeChecker.getPropertiesOfType(type);
-  return ts.createArrayLiteral(properties.map(property => ts.createLiteral(property.name)));
+  if (!type.symbol) {
+    return ts.createObjectLiteral([]);
+  }
+  const shape = walkShape(type, typeChecker);
+  return shape;
 }
 
 const indexTs = path.join(__dirname, 'index.ts');
-function isKeysCallExpression(node: ts.Node, typeChecker: ts.TypeChecker): node is ts.CallExpression {
+function isShapeCallExpression(node: ts.Node, typeChecker: ts.TypeChecker): node is ts.CallExpression {
   if (node.kind !== ts.SyntaxKind.CallExpression) {
     return false;
   }
@@ -37,5 +55,5 @@ function isKeysCallExpression(node: ts.Node, typeChecker: ts.TypeChecker): node 
   return !!declaration
     && (path.join(declaration.getSourceFile().fileName) === indexTs)
     && !!declaration['name']
-    && (declaration['name'].getText() === 'keys');
+    && (declaration['name'].getText() === 'shape');
 }

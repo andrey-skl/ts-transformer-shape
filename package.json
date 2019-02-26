@@ -4,7 +4,8 @@
   "description": "A custom TypeScript transformation to extract object structure from interface",
   "main": "index.js",
   "scripts": {
-    "compile": "tsc transformer.ts",
+    "compile": "tsc",
+    "debug-test-compile": "tsc && node --inspect-brk ./test/compileMain.js && mocha ./test/main.js",
     "test": "tsc && node ./test/compileMain.js && mocha ./test/main.js"
   },
   "repository": {

@@ -16,16 +16,15 @@ One is `shape` which is used in TypeScript codes to obtain keys of given type, w
 ## How to use `shape`
 
 ```ts
-import { shape } from 'ts-transformer-shape';
+import { shape } from '@huston007/ts-transformer-shape';
 
 interface Props {
   id: string;
-  name: string;
-  age: number;
+  age: {test: number};
 }
 const keysOfProps = shape<Props>();
 
-console.log(keysOfProps); // ['id', 'name', 'age']
+console.log(keysOfProps); // {id: null, age: {test: null}}
 ```
 
 ## How to use the custom transformer
@@ -39,7 +38,7 @@ See [examples/webpack](examples/webpack) for detail.
 
 ```js
 // webpack.config.js
-const shapeTransformer = require('ts-transformer-shape/transformer').default;
+const shapeTransformer = require('@huston007/ts-transformer-shape/transformer').default;
 
 module.exports = {
   // ...
@@ -69,7 +68,7 @@ See [examples/rollup](examples/rollup) for detail.
 ```js
 // rollup.config.js
 import typescript from 'rollup-plugin-typescript2';
-import shapeTransformer from 'ts-transformer-shape/transformer';
+import shapeTransformer from '@huston007/ts-transformer-shape/transformer';
 
 export default {
   // ...
@@ -108,7 +107,7 @@ You can try it with `$ npm test`.
 
 ```js
 const ts = require('typescript');
-const shapeTransformer = require('ts-transformer-shape/transformer').default;
+const shapeTransformer = require('@huston007/ts-transformer-shape/transformer').default;
 
 const program = ts.createProgram([/* your files to compile */], {
   strict: true,

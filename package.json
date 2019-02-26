@@ -30,10 +30,10 @@
   ],
   "homepage": "https://github.com/huston007/ts-transformer-shape#readme",
   "devDependencies": {
-    "@types/mocha": "^5.2.3",
-    "@types/node": "^10.3.5",
-    "mocha": "^5.2.0",
-    "typescript": "^2.9.2"
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^11.9.5",
+    "mocha": "^6.0.2",
+    "typescript": "^3.3.3333"
   },
   "peerDependencies": {
     "typescript": ">=2.4.1"

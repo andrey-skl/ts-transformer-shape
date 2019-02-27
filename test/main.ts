@@ -92,6 +92,16 @@ describe('shape', () => {
     assert.deepStrictEqual(shape<Child>(), {foo: null, bar: null});
   });
 
+  it('should construct shape of interface with property that is extending interface', () => {
+    interface Parent {foo: string;}
+    interface Child extends Parent {bar: number;}
+    interface Test {
+      str: string,
+      child: Child;
+    }
+    assert.deepStrictEqual(shape<Test>(), {str: null, child: {foo: null, bar: null}});
+  });
+
   const fileTransformationDir = path.join(__dirname, 'fileTransformation');
   fs.readdirSync(fileTransformationDir).filter((file) => path.extname(file) === '.ts').forEach((file) =>
     it(`transforms ${file} as expected`, () => {

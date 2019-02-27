@@ -56,7 +56,7 @@ function visitNode(node: ts.Node, program: ts.Program): ts.Node {
   if (!node.typeArguments) {
     return ts.createArrayLiteral([]);
   }
-  debugger
+
   const type = typeChecker.getTypeFromTypeNode(node.typeArguments[0]);
   if (!type.symbol) {
     return ts.createObjectLiteral([]);

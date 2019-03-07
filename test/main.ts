@@ -102,6 +102,17 @@ describe('shape', () => {
     assert.deepStrictEqual(shape<Test>(), {str: null, child: {foo: null, bar: null}});
   });
 
+  it('should construct shape of interface with "string | some array" property', () => {
+    interface Something {
+      id: string;
+    }
+    interface Test {
+      foo: Something[] | string;
+    }
+
+    assert.deepStrictEqual(shape<Test>(), {foo: [{id: null}]});
+  });
+
   const fileTransformationDir = path.join(__dirname, 'fileTransformation');
   fs.readdirSync(fileTransformationDir).filter((file) => path.extname(file) === '.ts').forEach((file) =>
     it(`transforms ${file} as expected`, () => {

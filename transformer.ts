@@ -11,6 +11,49 @@ function visitNodeAndChildren(node: ts.Node, program: ts.Program, context: ts.Tr
   return ts.visitEachChild(visitNode(node, program), childNode => visitNodeAndChildren(childNode, program, context), context);
 }
 
+function mergeUnions(shapes: ts.ObjectLiteralExpression[], typeChecker: ts.TypeChecker): ts.ObjectLiteralExpression | ts.NullLiteral {
+  const allKeys = shapes.reduce((acc, o) => {
+    return [...acc, ...o.properties];
+  }, [] as ts.ObjectLiteralElementLike[]);
+
+  const byName = new Map<string, typeof allKeys>();
+
+  allKeys.forEach(prop => {
+    if (!prop.name) {
+      return;
+    }
+    // @ts-ignore
+    const name = prop.name.text;
+    let item = byName.get(name);
+    if (!item) {
+      byName.set(name, []);
+      item = byName.get(name);
+    }
+
+    if (item) {
+      item.push(prop);
+    }
+  });
+
+  const uniqueKeys = Array.from(byName.keys());
+  const merged = ts.createObjectLiteral(uniqueKeys.map(key => {
+    const properties = (byName.get(key) || []);
+    // @ts-ignore
+    const shapeProperties = properties.filter(p => !!p.initializer.properties);
+    if (shapeProperties.length === 0) {
+      return ts.createPropertyAssignment(key, ts.createNull());
+    }
+    if (shapeProperties.length === 1) {
+      return shapeProperties[0];
+    }
+    // @ts-ignore
+    const nodes = shapeProperties.map(v => ts.createObjectLiteral([v.initializer]));
+    return ts.createPropertyAssignment(key, mergeUnions(nodes, typeChecker));
+  }));
+
+  return merged;
+}
+
 function walkShape(type: ts.Type, typeChecker: ts.TypeChecker): ts.ObjectLiteralExpression | ts.NullLiteral {
   if (!type.symbol || !type.symbol.members) {
     return ts.createNull();
@@ -28,12 +71,19 @@ function walkShape(type: ts.Type, typeChecker: ts.TypeChecker): ts.ObjectLiteral
 
     // Handle optional types like {foo?: string}, {foo: null | string}
     // @ts-ignore
-    const possibleTypes = valueType.types;
+    const possibleTypes: ts.Type[] = valueType.types;
     if (possibleTypes) {
-      const betterType = possibleTypes.filter((t: ts.Type) => !!t.symbol)[0];
-      if (betterType) {
-        valueType = betterType;
+      const shapeTypes = possibleTypes.filter(t => t.symbol);
+      if (shapeTypes.length === 0) {
+        return ts.createPropertyAssignment(val.name, ts.createNull());
       }
+      if (shapeTypes.length === 1) {
+        valueType = shapeTypes[0];
+      }
+      return ts.createPropertyAssignment(val.name, mergeUnions(
+        shapeTypes.map(t => walkShape(t, typeChecker) as ts.ObjectLiteralExpression),
+        typeChecker
+      ));
     }
 
     if (valueType.symbol && valueType.symbol.name === 'Array') {
@@ -56,7 +106,6 @@ function visitNode(node: ts.Node, program: ts.Program): ts.Node {
   if (!node.typeArguments) {
     return ts.createArrayLiteral([]);
   }
-
   const type = typeChecker.getTypeFromTypeNode(node.typeArguments[0]);
   if (!type.symbol) {
     return ts.createObjectLiteral([]);

@@ -29,6 +29,17 @@ describe('shape', () => {
     assert.deepStrictEqual(shape<Foo>(), {foo: null});
   });
 
+
+  it('should construct shape of simple union type', () => {
+    interface Foo {
+      foo: string;
+    }
+    interface Bar {
+      bar: string
+    }
+    assert.deepStrictEqual(shape<Foo | Bar>(), {foo: null, bar: null});
+  });
+
   it('should construct shape of deep interface', () => {
     interface Inner {
       bar: string;

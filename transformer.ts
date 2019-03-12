@@ -12,6 +12,7 @@ function visitNodeAndChildren(node: ts.Node, program: ts.Program, context: ts.Tr
 }
 
 function mergeUnions(shapes: ts.ObjectLiteralExpression[], typeChecker: ts.TypeChecker): ts.ObjectLiteralExpression | ts.NullLiteral {
+  debugger
   const allKeys = shapes.reduce((acc, o) => {
     return [...acc, ...o.properties];
   }, [] as ts.ObjectLiteralElementLike[]);
@@ -47,7 +48,7 @@ function mergeUnions(shapes: ts.ObjectLiteralExpression[], typeChecker: ts.TypeC
       return shapeProperties[0];
     }
     // @ts-ignore
-    const nodes = shapeProperties.map(v => ts.createObjectLiteral([v.initializer]));
+    const nodes = shapeProperties.map(v => v.initializer);
     return ts.createPropertyAssignment(key, mergeUnions(nodes, typeChecker));
   }));
 
@@ -80,10 +81,13 @@ function walkShape(type: ts.Type, typeChecker: ts.TypeChecker): ts.ObjectLiteral
       if (shapeTypes.length === 1) {
         valueType = shapeTypes[0];
       }
-      return ts.createPropertyAssignment(val.name, mergeUnions(
-        shapeTypes.map(t => walkShape(t, typeChecker) as ts.ObjectLiteralExpression),
-        typeChecker
-      ));
+      if (shapeTypes.length > 1) {
+        return ts.createPropertyAssignment(val.name, mergeUnions(
+          shapeTypes.map(t => walkShape(t, typeChecker) as ts.ObjectLiteralExpression),
+          typeChecker
+        ));
+      }
+      valueType = shapeTypes[0]
     }
 
     if (valueType.symbol && valueType.symbol.name === 'Array') {

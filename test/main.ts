@@ -51,14 +51,14 @@ describe('shape', () => {
     });
   });
 
-  // it('should construct shape of array values', () => {
-  //   interface Foo {
-  //     str: string;
-  //     foo: string[];
-  //     inn: BarBaz[]
-  //   }
-  //   assert.deepStrictEqual(shape<Foo>(), {str: null, foo: [null], inn: [{bar: null, baz: null}]});
-  // });
+  it('should construct shape of array values', () => {
+    interface Foo {
+      str: string;
+      foo: string[];
+      inn: BarBaz[]
+    }
+    assert.deepStrictEqual(shape<Foo>(), {str: null, foo: [null], inn: [{bar: null, baz: null}]});
+  });
 
   it('should construct shape of optional primitive types', () => {
     interface Test {
@@ -102,16 +102,16 @@ describe('shape', () => {
     assert.deepStrictEqual(shape<Test>(), {str: null, child: {foo: null, bar: null}});
   });
 
-  // it('should construct shape of interface with "string | some array" property', () => {
-  //   interface Something {
-  //     id: string;
-  //   }
-  //   interface Test {
-  //     foo: Something[] | string;
-  //   }
+  it('should construct shape of interface with "string | some array" property', () => {
+    interface Something {
+      id: string;
+    }
+    interface Test {
+      foo: Something[] | string;
+    }
 
-  //   assert.deepStrictEqual(shape<Test>(), {foo: [{id: null}]});
-  // });
+    assert.deepStrictEqual(shape<Test>(), {foo: [{id: null}]});
+  });
 
   it('should construct shape of interface with union of simple types', () => {
     interface Test {
@@ -152,20 +152,54 @@ describe('shape', () => {
     assert.deepStrictEqual(shape<Test>(), {tst: {bar: {inner: null}}});
   });
 
-  // it('should construct shape of unions with intersecting props', () => {
-  //   interface A {
-  //     foo1: string;
-  //     foo2: {b: string};
-  //   }
-  //   interface B {
-  //     foo2: string;
-  //   }
-  //   interface Test {
-  //     tst: A | B;
-  //   }
+  it('should construct veru deep shape of unions', () => {
+    interface A {
+      bar: {
+        a: number;
+        inner: {
+          inner1: string;
+          inner2: number;
+        };
+      };
+    }
+    interface B {
+      bar: {
+        inner: {
+          inner1: string;
+        };
+      };
+    }
+    interface Test {
+      tst: A | B;
+    }
 
-  //   assert.deepStrictEqual(shape<Test>(), {tst: {foo1: null, foo2: null}});
-  // });
+    assert.deepStrictEqual(shape<Test>(), {
+      tst: {
+        bar: {
+          a: null,
+          inner: {
+            inner1: null,
+            inner2: null
+          }
+        }
+      }
+    });
+  });
+
+  it('should construct shape of unions with intersecting props', () => {
+    interface A {
+      foo1: string;
+      foo2: {b: string};
+    }
+    interface B {
+      foo2: string;
+    }
+    interface Test {
+      tst: A | B;
+    }
+
+    assert.deepStrictEqual(shape<Test>(), {tst: {foo1: null, foo2: {b: null}}});
+  });
 
   // const fileTransformationDir = path.join(__dirname, 'fileTransformation');
   // fs.readdirSync(fileTransformationDir).filter((file) => path.extname(file) === '.ts').forEach((file) =>

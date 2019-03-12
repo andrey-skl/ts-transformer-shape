@@ -201,13 +201,86 @@ describe('shape', () => {
     assert.deepStrictEqual(shape<Test>(), {tst: {foo1: null, foo2: {b: null}}});
   });
 
-  // const fileTransformationDir = path.join(__dirname, 'fileTransformation');
-  // fs.readdirSync(fileTransformationDir).filter((file) => path.extname(file) === '.ts').forEach((file) =>
-  //   it(`transforms ${file} as expected`, () => {
-  //     let result = '';
-  //     const fullFileName = path.join(fileTransformationDir, file), postCompileFullFileName = fullFileName.replace(/\.ts$/, '.js');
-  //     compile([fullFileName], (fileName, data) => postCompileFullFileName === path.join(fileName) && (result = data));
-  //     assert.strictEqual(result.replace(/\r\n/g, '\n'), fs.readFileSync(postCompileFullFileName, 'utf-8'));
-  //   }).timeout(0)
-  // );
+
+  it('should construct shape of union array', () => {
+    interface A {
+      foo: number;
+    }
+    interface B {
+      bar: number;
+    }
+    type OneOf = A | B;
+    interface Test {
+      tst: OneOf[];
+    }
+
+    assert.deepStrictEqual(shape<Test>(), {tst: [{foo: null, bar: null}]});
+  });
+
+
+  it('should construct shape of deep union array', () => {
+    interface Item {
+      test: string;
+    }
+    interface A {
+      foo: Item[];
+    }
+    interface B {
+      foo: string[];
+      bar: number;
+    }
+    type OneOf = A | B;
+
+    assert.deepStrictEqual(shape<OneOf>(), {foo: [{test: null}], bar: null});
+  });
+
+
+  it('should construct deep inheritance and union', () => {
+    interface Comment {
+      id: string;
+      textPreview: string;
+    }
+
+    interface Item {
+      id: string;
+      name: string;
+    }
+
+    interface Base {
+      category: {id: string};
+    }
+
+    interface CommentItem extends Base {
+      category: {id: 'foo'};
+      added: Comment[];
+    }
+
+    interface ContentItem extends Base {
+      category: {id: 'bar'};
+      added: string;
+    }
+
+    interface FieldItem extends Base {
+      category: {id: 'test'};
+      added: Item[];
+    }
+
+    type AnyItem = CommentItem | ContentItem | FieldItem;
+    const res = shape<AnyItem>();
+
+    assert.deepStrictEqual(res, {
+      category: {id: null},
+      added: {id: null, textPreview: null, name: null}
+    });
+  });
+
+  const fileTransformationDir = path.join(__dirname, 'fileTransformation');
+  fs.readdirSync(fileTransformationDir).filter((file) => path.extname(file) === '.ts').forEach((file) =>
+    it(`transforms ${file} as expected`, () => {
+      let result = '';
+      const fullFileName = path.join(fileTransformationDir, file), postCompileFullFileName = fullFileName.replace(/\.ts$/, '.js');
+      compile([fullFileName], (fileName, data) => postCompileFullFileName === path.join(fileName) && (result = data));
+      assert.strictEqual(result.replace(/\r\n/g, '\n'), fs.readFileSync(postCompileFullFileName, 'utf-8'));
+    }).timeout(0)
+  );
 });

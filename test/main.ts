@@ -177,6 +177,18 @@ describe('shape', () => {
     assert.deepStrictEqual(shape<Test>(), {tst: {foo: null, bar: null}});
   });
 
+  it.skip('should construct very deep intersection shape', () => {
+    interface Base1 {id: string;}
+    interface Base2 {id2: string;}
+    type Union = Base1 | Base2;
+
+    type A = (Union) & {
+      id3: number;
+    }
+
+    assert.deepStrictEqual(shape<A>(), {id: null, id2: null, id3: null});
+  });
+
   it('should construct simple deep shape of unions', () => {
     interface A {
       bar: string;

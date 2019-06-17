@@ -70,6 +70,12 @@ function mergeUnions(shapes: (ts.ObjectLiteralExpression | ts.NullLiteral | ts.A
 
 function handleUnionOrIntersectionType(type: ts.UnionOrIntersectionType, typeChecker: ts.TypeChecker) {
   const possibleTypes: ts.Type[] = type.types;
+  if (possibleTypes.some(t => 'types' in t)) {
+    return mergeUnions(
+      possibleTypes.map(t => walkShape(t, typeChecker)),
+      typeChecker
+    );
+  }
   const shapeTypes = possibleTypes.filter(t => t.symbol);
   if (shapeTypes.length === 0) {
     return ts.createNull();

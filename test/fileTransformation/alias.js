@@ -5,7 +5,7 @@ var index_1 = require("../../index");
 var fooShape = { foo: null };
 console.log(fooShape);
 ({ foo: null, bar: null });
-var fooBarBazShape = { bar: null, baz: null };
+var fooBarBazShape = { foo: null, bar: null, baz: null };
 console.log('fooBarBazShape', fooBarBazShape);
 function shape() {
     return '';

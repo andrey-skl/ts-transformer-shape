@@ -34,7 +34,7 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.12.3",
     "mocha": "^6.2.2",
-    "typescript": "3.7.1-rc"
+    "typescript": "4.0.0-beta"
   },
   "peerDependencies": {
     "typescript": ">=2.4.1"

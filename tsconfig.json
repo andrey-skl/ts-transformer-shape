@@ -6,7 +6,9 @@
     "suppressImplicitAnyIndexErrors": true,
     "noEmitOnError": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "allowJs": true,
+    "declaration": true
   },
   "include": [
     "index.ts",

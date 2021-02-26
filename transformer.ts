@@ -138,7 +138,6 @@ function visitNode(node: ts.Node, program: ts.Program): ts.Node {
   return shape;
 }
 
-const indexTs = path.join(__dirname, 'index.ts');
 function isShapeCallExpression(node: ts.Node, typeChecker: ts.TypeChecker): node is ts.CallExpression {
   if (node.kind !== ts.SyntaxKind.CallExpression) {
     return false;
@@ -148,8 +147,9 @@ function isShapeCallExpression(node: ts.Node, typeChecker: ts.TypeChecker): node
     return false;
   }
   const { declaration } = signature;
+
   return !!declaration
-    && (path.join(declaration.getSourceFile().fileName) === indexTs)
+    && path.join(declaration.getSourceFile().fileName).includes('ts-transformer-shape/index')
     && !!declaration['name']
     && (declaration['name'].getText() === 'shape');
 }

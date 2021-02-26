@@ -25,9 +25,9 @@
   },
   "files": [
     "index.js",
-    "index.d.ts",
+    "index.ts",
     "transformer.js",
-    "transformer.d.ts"
+    "transformer.ts"
   ],
   "homepage": "https://github.com/huston007/ts-transformer-shape#readme",
   "devDependencies": {

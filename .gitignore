@@ -1,5 +1,4 @@
 *.js
-*.d.ts
 !test/fileTransformation/*.js
 !test/compileMain.js
 npm-debug.log*

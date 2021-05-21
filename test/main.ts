@@ -1,8 +1,9 @@
-import { shape } from '../index';
+import { shape } from '../../ts-transformer-shape';
 import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
 import { compile } from './compile';
+import {External} from './external-types';
 
 describe('shape', () => {
   type FooBar = {
@@ -287,6 +288,9 @@ describe('shape', () => {
     assert.deepStrictEqual(shape<OneOf>(), {foo: [{test: null}], bar: null});
   });
 
+  it('should construct shape for external imported type', () => {
+    assert.deepStrictEqual(shape<External>(), {foo: null});
+  })
 
   it('should construct deep inheritance and union', () => {
     interface Comment {

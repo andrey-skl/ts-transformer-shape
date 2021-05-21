@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var index_1 = require("../../index");
+var index_1 = require("../../../ts-transformer-shape/index");
 [];
 var fooShape = { foo: null };
 console.log(fooShape);

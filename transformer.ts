@@ -1,5 +1,4 @@
 import * as ts from 'typescript';
-import * as path from 'path';
 
 export default function transformer(program: ts.Program): ts.TransformerFactory<ts.SourceFile> {
   return (context: ts.TransformationContext) => (file: ts.SourceFile) => visitNodeAndChildren(file, program, context);
@@ -139,17 +138,26 @@ function visitNode(node: ts.Node, program: ts.Program): ts.Node {
 }
 
 function isShapeCallExpression(node: ts.Node, typeChecker: ts.TypeChecker): node is ts.CallExpression {
-  if (node.kind !== ts.SyntaxKind.CallExpression) {
+  if (!ts.isCallExpression(node)) {
     return false;
   }
-  const signature = typeChecker.getResolvedSignature(node as ts.CallExpression);
-  if (typeof signature === 'undefined') {
-    return false;
-  }
-  const { declaration } = signature;
 
-  return !!declaration
-    && path.join(declaration.getSourceFile().fileName).includes('ts-transformer-shape/index')
-    && !!declaration['name']
-    && (declaration['name'].getText() === 'shape');
+  const name = (node.expression as ts.Identifier)?.escapedText ?? '';
+
+  //@ts-expect-error
+  const imports: StringLiteral[] = node.getSourceFile().imports;
+
+  const shapeImport = imports.find(it => it.text.includes('ts-transformer-shape'));
+
+  if (!shapeImport) {
+    return false;
+  }
+
+  const importBindings = shapeImport.parent.importClause.namedBindings;
+
+  if (importBindings.elements.some((it: any) => it.name.escapedText === name)) {
+    return true;
+  }
+
+  return false;
 }

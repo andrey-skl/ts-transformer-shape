@@ -17,6 +17,7 @@ module.exports = {
         test: /\.ts$/,
         loader: 'ts-loader',
         options: {
+          transpileOnly: true,
           getCustomTransformers: program => ({
             before: [transformer(program)]
           })

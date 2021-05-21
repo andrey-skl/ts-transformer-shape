@@ -1,4 +1,4 @@
-import {shape} from '../../index';
+import {shape} from '../../../ts-transformer-shape/index';
 
 interface Foo {
   foo: string;

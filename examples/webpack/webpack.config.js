@@ -1,10 +1,11 @@
-const keysTransformer = require('ts-transformer-keys/transformer').default;
+const transformer = require('@huston007/ts-transformer-shape/transformer').default;
 
-module.exports = ['ts-loader', 'awesome-typescript-loader'].map(loader => ({
+module.exports = {
   mode: 'development',
+  devtool: false,
   entry: './index.ts',
   output: {
-    filename: `${loader}.js`,
+    filename: `built-reference.js`,
     path: __dirname
   },
   resolve: {
@@ -14,15 +15,13 @@ module.exports = ['ts-loader', 'awesome-typescript-loader'].map(loader => ({
     rules: [
       {
         test: /\.ts$/,
-        loader,
+        loader: 'ts-loader',
         options: {
           getCustomTransformers: program => ({
-              before: [
-                  keysTransformer(program)
-              ]
+            before: [transformer(program)]
           })
         }
       }
     ]
   }
-}));
+};

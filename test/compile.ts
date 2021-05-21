@@ -15,6 +15,11 @@ export function compile(filePaths: string[], writeFileCallback?: ts.WriteFileCal
   const { emitSkipped, diagnostics } = program.emit(undefined, writeFileCallback, undefined, false, transformers);
 
   if (emitSkipped) {
-    throw new Error(diagnostics.map(diagnostic => diagnostic.messageText).join('\n'));
+    throw new Error(diagnostics.map(diagnostic => {
+      if (typeof diagnostic.messageText === 'string') {
+        return diagnostic.messageText;
+      }
+      return diagnostic.messageText.messageText;
+    }).join('\n'));
   }
 }

@@ -13,6 +13,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.shape = void 0;
 function shape() {
     // This is fake function content. It gets replaced by the transformer
+    console.error('@huston007/ts-transformer-shape was not applied by TS compiler! Check configuration');
     return {};
 }
 exports.shape = shape;

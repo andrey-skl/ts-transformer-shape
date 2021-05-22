@@ -127,6 +127,13 @@ function visitNode(node: ts.Node, program: ts.Program): ts.Node {
     return ts.createArrayLiteral([]);
   }
   const type = typeChecker.getTypeFromTypeNode(node.typeArguments[0]);
+
+  // @ts-expect-error
+  if (type.intrinsicName === 'error') {
+    // @ts-expect-error
+    throw new Error(`Failed to retrieve type details for "shape<${node.typeArguments[0].typeName.escapedText}>". You may need to declare type in same file if use with "transpileOnly: true".`);
+  }
+
   const shape = walkShape(type, typeChecker);
 
   if (!('properties' in shape)) {

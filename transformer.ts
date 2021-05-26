@@ -114,6 +114,12 @@ function walkShape(type: ts.Type | ts.UnionOrIntersectionType, typeChecker: ts.T
   return ts.createObjectLiteral(values.map((val: ts.Symbol) => {
     let valueType = typeChecker.getTypeAtLocation(val.valueDeclaration) as ts.Type | ts.UnionOrIntersectionType;
 
+    // @ts-expect-error
+    if (valueType.intrinsicName === 'error') {
+      // @ts-expect-error
+      throw new Error(`No type details available for ${val.parent.escapedName}[${val.escapedName}]. Are you using transpileOnly: true? Then you may not reference types in another files.`);
+    }
+
     return ts.createPropertyAssignment(val.name, walkShape(valueType, typeChecker));
   }));
 }

@@ -126,7 +126,7 @@ function walkShape(type: ts.Type | ts.UnionOrIntersectionType, typeChecker: ts.T
       if (error.message === 'Maximum call stack size exceeded') {
         throw new Error(`
 >>>   "ts-transformer-shape" error: ${error.message}
->>>   IN: "${val.valueDeclaration.getText()}"
+>>>   IN: "${type.symbol?.escapedName}", where "${val.valueDeclaration.getText()}" is declared.
 >>>   DID YOU WRITE A TYPE THAT HAS CIRCULAR REFERENCE???
 `);
       }

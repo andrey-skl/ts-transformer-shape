@@ -120,7 +120,18 @@ function walkShape(type: ts.Type | ts.UnionOrIntersectionType, typeChecker: ts.T
       throw new Error(`No type details available for ${val.parent.escapedName}[${val.escapedName}]. Are you using transpileOnly: true? Then you may not reference types in another files.`);
     }
 
-    return ts.createPropertyAssignment(val.name, walkShape(valueType, typeChecker));
+    try {
+      return ts.createPropertyAssignment(val.name, walkShape(valueType, typeChecker));
+    } catch (error: any) {
+      if (error.message === 'Maximum call stack size exceeded') {
+        throw new Error(`
+>>>   "ts-transformer-shape" error: ${error.message}
+>>>   IN: "${val.valueDeclaration.getText()}"
+>>>   DID YOU WRITE A TYPE THAT HAS CIRCULAR REFERENCE???
+`);
+      }
+      throw error;
+    }
   }));
 }
 

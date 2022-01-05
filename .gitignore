@@ -1,6 +1,6 @@
 *.js
 *.d.ts
-!test/fileTransformation/*.js
-!test/compileMain.js
+!test/fixtures/*.js
+!test/tests-compiler/compileMain.js
 npm-debug.log*
 node_modules

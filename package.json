@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "debug-test-compile": "tsc && node --inspect-brk ./test/compileMain.js && mocha ./test/main.js",
-    "test": "tsc && node ./test/compileMain.js && mocha ./test/main.js"
+    "debug-test-compile": "tsc && node --inspect-brk ./test/tests-compiler/compileMain.js && mocha ./test/main.js",
+    "test": "tsc && node ./test/tests-compiler/compileMain.js && mocha ./test/main.js"
   },
   "repository": {
     "type": "git",

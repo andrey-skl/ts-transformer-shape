@@ -13,7 +13,7 @@
   "include": [
     "index.ts",
     "transformer.ts",
-    "test/compile.ts"
+    "test/tests-compiler/compile.ts"
   ],
   "exclude": [
     "node_modules"

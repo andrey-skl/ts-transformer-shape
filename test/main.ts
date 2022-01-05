@@ -2,8 +2,8 @@ import { shape } from '../../ts-transformer-shape';
 import * as assert from 'assert';
 import * as path from 'path';
 import * as fs from 'fs';
-import { compile } from './compile';
-import {External} from './external-types';
+import { compile } from './tests-compiler/compile';
+import {External} from './utils/external-types';
 
 describe('shape', () => {
   type FooBar = {
@@ -331,7 +331,12 @@ describe('shape', () => {
     });
   });
 
-  const fileTransformationDir = path.join(__dirname, 'fileTransformation');
+
+  /*
+   * File fixtures tests
+   */
+  const fileTransformationDir = path.join(__dirname, 'fixtures');
+
   fs.readdirSync(fileTransformationDir).filter((file) => path.extname(file) === '.ts').forEach((file) =>
     it(`transforms ${file} as expected`, () => {
       let result = '';

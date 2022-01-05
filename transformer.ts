@@ -7,10 +7,15 @@ export default function transformer(program: ts.Program): ts.TransformerFactory<
 function visitNodeAndChildren(node: ts.SourceFile, program: ts.Program, context: ts.TransformationContext): ts.SourceFile;
 function visitNodeAndChildren(node: ts.Node, program: ts.Program, context: ts.TransformationContext): ts.Node;
 function visitNodeAndChildren(node: ts.Node, program: ts.Program, context: ts.TransformationContext): ts.Node {
-  return ts.visitEachChild(visitNode(node, program), childNode => visitNodeAndChildren(childNode, program, context), context);
+  return ts.visitEachChild(visitNode(node, program, context), childNode => visitNodeAndChildren(childNode, program, context), context);
 }
 
-function mergeUnions(shapes: (ts.ObjectLiteralExpression | ts.NullLiteral | ts.ArrayLiteralExpression)[], typeChecker: ts.TypeChecker): ts.ObjectLiteralExpression | ts.NullLiteral {
+function mergeUnions(
+  shapes: (ts.ObjectLiteralExpression | ts.NullLiteral | ts.ArrayLiteralExpression)[],
+  typeChecker: ts.TypeChecker,
+  context: ts.TransformationContext
+): ts.ObjectLiteralExpression | ts.NullLiteral {
+  const factory = context.factory;
   const allKeys = shapes.reduce((acc, o) => {
     if ('elements' in o) {
       // @ts-ignore
@@ -42,7 +47,7 @@ function mergeUnions(shapes: (ts.ObjectLiteralExpression | ts.NullLiteral | ts.A
   });
 
   const uniqueKeys = Array.from(byName.keys());
-  const merged = ts.createObjectLiteral(uniqueKeys.map(key => {
+  const merged = factory.createObjectLiteralExpression(uniqueKeys.map(key => {
     const properties = (byName.get(key) || []);
     const shapeProperties = properties.filter(p => {
       // @ts-ignore
@@ -54,64 +59,76 @@ function mergeUnions(shapes: (ts.ObjectLiteralExpression | ts.NullLiteral | ts.A
       return initializer.elements && initializer.elements.every(node => !!node.properties);
     });
     if (shapeProperties.length === 0) {
-      return ts.createPropertyAssignment(key, ts.createNull());
+      return factory.createPropertyAssignment(key, ts.createNull());
     }
     if (shapeProperties.length === 1) {
       return shapeProperties[0];
     }
     // @ts-ignore
     const nodes = shapeProperties.map(v => v.initializer);
-    return ts.createPropertyAssignment(key, mergeUnions(nodes, typeChecker));
+    return factory.createPropertyAssignment(key, mergeUnions(nodes, typeChecker, context));
   }));
 
   return merged;
 }
 
-function handleUnionOrIntersectionType(type: ts.UnionOrIntersectionType, typeChecker: ts.TypeChecker) {
+function handleUnionOrIntersectionType(
+  type: ts.UnionOrIntersectionType,
+  typeChecker: ts.TypeChecker,
+  context: ts.TransformationContext
+) {
   const possibleTypes: ts.Type[] = type.types;
   if (possibleTypes.some(t => 'types' in t)) {
     return mergeUnions(
-      possibleTypes.map(t => walkShape(t, typeChecker)),
-      typeChecker
+      possibleTypes.map(t => walkShape(t, typeChecker, context)),
+      typeChecker,
+      context
     );
   }
   const shapeTypes = possibleTypes.filter(t => t.symbol);
   if (shapeTypes.length === 0) {
-    return ts.createNull();
+    return context.factory.createNull();
   }
 
   if (shapeTypes.length === 1) {
-    return walkShape(shapeTypes[0], typeChecker);
+    return walkShape(shapeTypes[0], typeChecker, context);
   }
 
   return mergeUnions(
-    shapeTypes.map(t => walkShape(t, typeChecker)),
-    typeChecker
+    shapeTypes.map(t => walkShape(t, typeChecker, context)),
+    typeChecker,
+    context
   );
 }
 
-function walkShape(type: ts.Type | ts.UnionOrIntersectionType, typeChecker: ts.TypeChecker): ts.ObjectLiteralExpression | ts.NullLiteral | ts.ArrayLiteralExpression {
+function walkShape(
+  type: ts.Type | ts.UnionOrIntersectionType,
+  typeChecker: ts.TypeChecker,
+  context: ts.TransformationContext
+): ts.ObjectLiteralExpression | ts.NullLiteral | ts.ArrayLiteralExpression {
+  if (!context) {
+    debugger
+  }
   if ('types' in type) {
-    return handleUnionOrIntersectionType(type, typeChecker);
+    return handleUnionOrIntersectionType(type, typeChecker, context);
   }
 
   if (!type.symbol || !type.symbol.members) {
-    return ts.createNull();
+    return context.factory.createNull();
   }
 
   // TODO: find better way to not walk through native types
   if (['Function', 'Date'].includes(type.symbol.name)) {
-    return ts.createNull();
+    return context.factory.createNull();
   }
 
   if (type.symbol.name === 'Array') {
-    // @ts-ignore
-    return ts.createArrayLiteral([walkShape(type.typeArguments[0], typeChecker)])
+    return context.factory.createArrayLiteralExpression([walkShape((type as any).typeArguments[0], typeChecker, context)])
   }
 
   const values: ts.Symbol[] = typeChecker.getAugmentedPropertiesOfType(type);
 
-  return ts.createObjectLiteral(values.map((val: ts.Symbol) => {
+  return context.factory.createObjectLiteralExpression(values.map((val: ts.Symbol) => {
     let valueType = typeChecker.getTypeAtLocation(val.valueDeclaration) as ts.Type | ts.UnionOrIntersectionType;
 
     // @ts-expect-error
@@ -121,7 +138,7 @@ function walkShape(type: ts.Type | ts.UnionOrIntersectionType, typeChecker: ts.T
     }
 
     try {
-      return ts.createPropertyAssignment(val.name, walkShape(valueType, typeChecker));
+      return ts.createPropertyAssignment(val.name, walkShape(valueType, typeChecker, context));
     } catch (error: any) {
       if (error.message === 'Maximum call stack size exceeded') {
         throw new Error(`
@@ -135,13 +152,13 @@ function walkShape(type: ts.Type | ts.UnionOrIntersectionType, typeChecker: ts.T
   }));
 }
 
-function visitNode(node: ts.Node, program: ts.Program): ts.Node {
+function visitNode(node: ts.Node, program: ts.Program, context: ts.TransformationContext): ts.Node {
   const typeChecker = program.getTypeChecker();
   if (!isShapeCallExpression(node, typeChecker)) {
     return node;
   }
   if (!node.typeArguments) {
-    return ts.createArrayLiteral([]);
+    return context.factory.createArrayLiteralExpression([]);
   }
   const type = typeChecker.getTypeFromTypeNode(node.typeArguments[0]);
 
@@ -151,11 +168,11 @@ function visitNode(node: ts.Node, program: ts.Program): ts.Node {
     throw new Error(`Failed to retrieve type details for "shape<${node.typeArguments[0].typeName.escapedText}>". You may need to declare type in same file if use with "transpileOnly: true".`);
   }
 
-  const shape = walkShape(type, typeChecker);
+  const shape = walkShape(type, typeChecker, context);
 
   if (!('properties' in shape)) {
     // we've got no properties, let's return {} instead of 'null'
-    return ts.createObjectLiteral([]);
+    return context.factory.createObjectLiteralExpression([]);
   }
 
   return shape;

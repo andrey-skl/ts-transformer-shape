@@ -1,4 +1,4 @@
-import { shape as s} from '../../index';
+import { shape as s} from '../../../ts-transformer-shape/index';
 
 s();
 

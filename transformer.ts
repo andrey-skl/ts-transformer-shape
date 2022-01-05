@@ -196,7 +196,7 @@ function isShapeCallExpression(node: ts.Node, typeChecker: ts.TypeChecker): node
 
   const importBindings = shapeImport.parent.importClause.namedBindings;
 
-  if (importBindings.elements.some((it: any) => it.name.escapedText === name)) {
+  if (importBindings?.elements.some((it: any) => it.name.escapedText === name)) {
     return true;
   }
 

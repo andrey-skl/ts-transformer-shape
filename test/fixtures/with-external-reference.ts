@@ -1,4 +1,4 @@
-import {shape} from '../../index';
+import {shape} from '../../../ts-transformer-shape/index';
 import {External} from '../utils/external-types';
 
 interface CompositeType {

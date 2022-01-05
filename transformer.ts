@@ -18,7 +18,7 @@ function mergeUnions(
   const factory = context.factory;
   const allKeys = shapes.reduce((acc, o) => {
     if ('elements' in o) {
-      // @ts-ignore
+      // @ts-expect-error
       return [...acc, ...o.elements[0].properties];
     }
     if (!('properties' in o)) {
@@ -33,7 +33,7 @@ function mergeUnions(
     if (!prop.name) {
       return;
     }
-    // @ts-ignore
+    // @ts-expect-error
     const name = prop.name.text;
     let item = byName.get(name);
     if (!item) {
@@ -50,12 +50,12 @@ function mergeUnions(
   const merged = factory.createObjectLiteralExpression(uniqueKeys.map(key => {
     const properties = (byName.get(key) || []);
     const shapeProperties = properties.filter(p => {
-      // @ts-ignore
+      // @ts-expect-error
       const initializer = p.initializer;
       if (initializer.properties) {
         return true;
       }
-      // @ts-ignore
+      // @ts-expect-error
       return initializer.elements && initializer.elements.every(node => !!node.properties);
     });
     if (shapeProperties.length === 0) {
@@ -64,7 +64,7 @@ function mergeUnions(
     if (shapeProperties.length === 1) {
       return shapeProperties[0];
     }
-    // @ts-ignore
+    // @ts-expect-error
     const nodes = shapeProperties.map(v => v.initializer);
     return factory.createPropertyAssignment(key, mergeUnions(nodes, typeChecker, context));
   }));
@@ -106,9 +106,6 @@ function walkShape(
   typeChecker: ts.TypeChecker,
   context: ts.TransformationContext
 ): ts.ObjectLiteralExpression | ts.NullLiteral | ts.ArrayLiteralExpression {
-  if (!context) {
-    debugger
-  }
   if ('types' in type) {
     return handleUnionOrIntersectionType(type, typeChecker, context);
   }
@@ -129,6 +126,9 @@ function walkShape(
   const values: ts.Symbol[] = typeChecker.getAugmentedPropertiesOfType(type);
 
   return context.factory.createObjectLiteralExpression(values.map((val: ts.Symbol) => {
+    if (!val.valueDeclaration) {
+      throw new Error(`No valueDeclaration found for ${val.escapedName}`);
+    }
     let valueType = typeChecker.getTypeAtLocation(val.valueDeclaration) as ts.Type | ts.UnionOrIntersectionType;
 
     // @ts-expect-error
@@ -138,12 +138,12 @@ function walkShape(
     }
 
     try {
-      return ts.createPropertyAssignment(val.name, walkShape(valueType, typeChecker, context));
+      return context.factory.createPropertyAssignment(val.name, walkShape(valueType, typeChecker, context));
     } catch (error: any) {
       if (error.message === 'Maximum call stack size exceeded') {
         throw new Error(`
 >>>   "ts-transformer-shape" error: ${error.message}
->>>   IN: "${type.symbol?.escapedName}", where "${val.valueDeclaration.getText()}" is declared.
+>>>   IN: "${type.symbol?.escapedName}", where "${val.valueDeclaration?.getText()}" is declared.
 >>>   DID YOU WRITE A TYPE THAT HAS CIRCULAR REFERENCE???
 `);
       }

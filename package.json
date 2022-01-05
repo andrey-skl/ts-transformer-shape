@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "debug-test-compile": "tsc && node --inspect-brk ./test/tests-compiler/compileMain.js && mocha ./test/main.js",
-    "test": "tsc && node ./test/tests-compiler/compileMain.js && mocha ./test/main.js"
+    "test": "tsc && node ./test/tests-compiler/compileMain.js && mocha ./test/main.js",
+    "transpile": "tsc && node ./test/tests-compiler/transpileMain.js"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 {
   "name": "@huston007/ts-transformer-shape",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "A custom TypeScript transformation to extract object structure from interface",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,7 @@
   "keywords": [
     "TypeScript"
   ],
-  "authors": "kimamula",
+  "authors": "huston007",
   "contributors": [
     "huston007"
   ],

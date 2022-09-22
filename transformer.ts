@@ -59,7 +59,7 @@ function mergeUnions(
       return initializer.elements && initializer.elements.every(node => !!node.properties);
     });
     if (shapeProperties.length === 0) {
-      return factory.createPropertyAssignment(key, ts.createNull());
+      return factory.createPropertyAssignment(key, context.factory.createNull());
     }
     if (shapeProperties.length === 1) {
       return shapeProperties[0];

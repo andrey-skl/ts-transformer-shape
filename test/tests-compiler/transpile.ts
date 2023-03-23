@@ -6,7 +6,6 @@ export function transpile(filePath: string, writeFileCallback?: ts.WriteFileCall
   const options: ts.CompilerOptions = {
     strict: true,
     noEmitOnError: true,
-    suppressImplicitAnyIndexErrors: true,
     target: ts.ScriptTarget.ES5
   };
 

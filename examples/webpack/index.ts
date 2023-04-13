@@ -1,4 +1,5 @@
 import {shape} from '@huston007/ts-transformer-shape';
+import {type External} from './external-type';
 
 interface Foo {
   foo: string;
@@ -6,3 +7,5 @@ interface Foo {
 
 // NOTICE INTERFACE SHAPE HERE:
 shape<Foo>();
+// NOTICE EXTERNAL INTERFACE SHAPE HERE:
+shape<External>();

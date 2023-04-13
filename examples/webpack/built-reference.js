@@ -61,6 +61,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 var ts_transformer_shape_1 = __webpack_require__(/*! @huston007/ts-transformer-shape */ "../../index.js");
 // NOTICE INTERFACE SHAPE HERE:
 ({ foo: null });
+// NOTICE EXTERNAL INTERFACE SHAPE HERE:
+({ bar: null });
 
 })();
 

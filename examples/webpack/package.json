@@ -3,9 +3,9 @@
     "start": "webpack"
   },
   "devDependencies": {
-    "ts-loader": "^9.2.6",
+    "ts-loader": "^9.4.2",
     "@huston007/ts-transformer-shape": "file:../../",
-    "webpack": "^5.65.0",
-    "webpack-cli": "^4.9.1"
+    "webpack": "^5.79.0",
+    "webpack-cli": "^5.0.1"
   }
 }

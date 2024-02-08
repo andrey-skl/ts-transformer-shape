@@ -124,7 +124,7 @@ function walkShape(
   }
 
   const values: ts.Symbol[] = typeChecker.getAugmentedPropertiesOfType(type)
-    .filter(v => !v.name.startsWith('__@symbol'));
+    .filter(v => !v.name.startsWith('__@'));
 
   return context.factory.createObjectLiteralExpression(values.map((val: ts.Symbol) => {
     if (!val.valueDeclaration) {

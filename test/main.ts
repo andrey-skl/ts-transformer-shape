@@ -255,6 +255,16 @@ describe('shape', () => {
     assert.deepStrictEqual(shape<Test>(), {tst: {foo1: null, foo2: {b: null}}});
   });
 
+  it('should ignore symbols', () => {
+    const symbol = Symbol();
+    type WithSymbol = {
+      id: string;
+      [symbol]: string;
+    }
+
+    assert.deepStrictEqual(shape<WithSymbol>(), {id: null});
+  });
+
 
   it('should construct shape of union array', () => {
     interface A {

@@ -123,7 +123,8 @@ function walkShape(
     return context.factory.createArrayLiteralExpression([walkShape((type as any).typeArguments[0], typeChecker, context)])
   }
 
-  const values: ts.Symbol[] = typeChecker.getAugmentedPropertiesOfType(type);
+  const values: ts.Symbol[] = typeChecker.getAugmentedPropertiesOfType(type)
+    .filter(v => !v.name.startsWith('__@symbol'));
 
   return context.factory.createObjectLiteralExpression(values.map((val: ts.Symbol) => {
     if (!val.valueDeclaration) {

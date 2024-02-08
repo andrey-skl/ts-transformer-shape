@@ -5,6 +5,8 @@ import * as fs from 'fs';
 import { compile } from './tests-compiler/compile';
 import {External} from './utils/external-types';
 
+declare const SymbolForOpaqueKey: unique symbol;
+
 describe('shape', () => {
   type FooBar = {
     foo: string;
@@ -260,11 +262,11 @@ describe('shape', () => {
     type WithSymbol = {
       id: string;
       [symbol]: string;
+      [SymbolForOpaqueKey]: string;
     }
 
     assert.deepStrictEqual(shape<WithSymbol>(), {id: null});
   });
-
 
   it('should construct shape of union array', () => {
     interface A {

@@ -268,6 +268,16 @@ describe('shape', () => {
     assert.deepStrictEqual(shape<WithSymbol>(), {id: null});
   });
 
+  it('should ignore symbols used as opaque type', () => {
+    const symbol = Symbol();
+
+    type WithSymbol = {
+      id: {[symbol]: string} & string;
+    }
+
+    assert.deepStrictEqual(shape<WithSymbol>(), {id: null});
+  });
+
   it('should construct shape of union array', () => {
     interface A {
       foo: number;

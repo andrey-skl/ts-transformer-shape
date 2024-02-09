@@ -10,6 +10,10 @@ function visitNodeAndChildren(node: ts.Node, program: ts.Program, context: ts.Tr
   return ts.visitEachChild(visitNode(node, program, context), childNode => visitNodeAndChildren(childNode, program, context), context);
 }
 
+function isESSYmbol(s: ts.Symbol) {
+  return s.name.startsWith('__@');
+}
+
 function mergeUnions(
   shapes: (ts.ObjectLiteralExpression | ts.NullLiteral | ts.ArrayLiteralExpression)[],
   typeChecker: ts.TypeChecker,
@@ -85,7 +89,12 @@ function handleUnionOrIntersectionType(
       context
     );
   }
-  const shapeTypes = possibleTypes.filter(t => t.symbol);
+  const shapeTypes = possibleTypes
+    .filter(t => t.symbol)
+    .filter(t => {
+      const props = t.getProperties();
+      return !(props.length > 0 && props.every(isESSYmbol));
+    })
   if (shapeTypes.length === 0) {
     return context.factory.createNull();
   }
@@ -124,7 +133,7 @@ function walkShape(
   }
 
   const values: ts.Symbol[] = typeChecker.getAugmentedPropertiesOfType(type)
-    .filter(v => !v.name.startsWith('__@'));
+    .filter(v => !isESSYmbol(v));
 
   return context.factory.createObjectLiteralExpression(values.map((val: ts.Symbol) => {
     if (!val.valueDeclaration) {

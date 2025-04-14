@@ -37,7 +37,6 @@ function mergeUnions(
     if (!prop.name) {
       return;
     }
-    // @ts-expect-error
     const name = prop.name.text;
     let item = byName.get(name);
     if (!item) {
@@ -54,7 +53,6 @@ function mergeUnions(
   const merged = factory.createObjectLiteralExpression(uniqueKeys.map(key => {
     const properties = (byName.get(key) || []);
     const shapeProperties = properties.filter(p => {
-      // @ts-expect-error
       const initializer = p.initializer;
       if (initializer.properties) {
         return true;
@@ -68,7 +66,6 @@ function mergeUnions(
     if (shapeProperties.length === 1) {
       return shapeProperties[0];
     }
-    // @ts-expect-error
     const nodes = shapeProperties.map(v => v.initializer);
     return factory.createPropertyAssignment(key, mergeUnions(nodes, typeChecker, context));
   }));

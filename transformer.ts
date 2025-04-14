@@ -7,7 +7,16 @@ export default function transformer(program: ts.Program): ts.TransformerFactory<
 function visitNodeAndChildren(node: ts.SourceFile, program: ts.Program, context: ts.TransformationContext): ts.SourceFile;
 function visitNodeAndChildren(node: ts.Node, program: ts.Program, context: ts.TransformationContext): ts.Node;
 function visitNodeAndChildren(node: ts.Node, program: ts.Program, context: ts.TransformationContext): ts.Node {
-  return ts.visitEachChild(visitNode(node, program, context), childNode => visitNodeAndChildren(childNode, program, context), context);
+  try {
+    return ts.visitEachChild(visitNode(node, program, context), childNode => visitNodeAndChildren(childNode, program, context), context);
+  } catch (error: unknown) {
+    // Detailed error output:
+    const file = node.getSourceFile().fileName;
+    console.error(`=== Error when processing: ${file} ===
+=== node: ${node.getText()} ===`);
+
+    throw error;
+  }
 }
 
 function isESSYmbol(s: ts.Symbol) {
